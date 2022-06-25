@@ -11,8 +11,6 @@ NodeJS app that creates an image of the Fortnite Battle Royale Item Shop of the 
 
 - NodeJS (https://nodejs.org/)
 
--> On Windows you can just open the `Install Modules.bat` file.
-
 # Installing
 
 Just run `npm install` on Terminal.
