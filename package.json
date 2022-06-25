@@ -1,0 +1,17 @@
+{
+  "name": "fnitemshopgenerator",
+  "version": "1.0.0",
+  "description": "Generates an image of the fortnite battle royale item shop",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "Sprintermax",
+  "license": "MIT",
+  "dependencies": {
+    "jimp": "^0.16.1",
+    "node-fetch": "^3.2.6"
+  }
+}
