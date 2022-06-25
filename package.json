@@ -7,7 +7,14 @@
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sprintermax/FNItemShopGenerator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sprintermax/FNItemShopGenerator/issues"
+  },
+  "homepage": "https://github.com/sprintermax/FNItemShopGenerator#readme",
   "author": "Sprintermax",
   "license": "MIT",
   "dependencies": {
