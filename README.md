@@ -7,7 +7,6 @@ NodeJS app that creates an image of the Fortnite Battle Royale Item Shop of the 
 - Supports items and bundles.
 - Images sorted alphabetically and by rarity with bundles and series on top.
 - Indicator if the item comes with bonus items and/or total item quantity.
-- This app uses the Fortnite API provided by https://fortnite-api.com
 
 # Requirements
 
@@ -21,9 +20,9 @@ Just run `npm install` on Terminal.
 
 # Usage
 
-Run `npm start`, `node .` or `node index.js` on Terminal.
+Run `npm start` or `node .` on Terminal.
 
--> On Windows you can just open the `Get Store.bat` file.
+-> On Windows you can just open the `Get Store API0.bat` or `Get Store API1.bat` file.
 
 
 # Other

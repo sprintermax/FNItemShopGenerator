@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Generates an image of the fortnite battle royale item shop",
   "type": "module",
-  "main": "index.js",
+  "main": "index_fn-api.com.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index_fn-api.com.js"
   },
   "repository": {
     "type": "git",
