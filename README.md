@@ -1,7 +1,7 @@
 # FNItemShopGenerator
 NodeJS app that creates an image of the Fortnite Battle Royale Item Shop of the day.
 
-![Example image](ImagensGeradas/ItemShop-_26-06-2022_e69b295a8b7bc95544fca6480a5b2bbe560f3b62.png)
+![Example image](example.png)
 
 **Features**
 - Supports items and bundles.

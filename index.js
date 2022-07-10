@@ -3,55 +3,7 @@
 import fetch from 'node-fetch';
 import Jimp from 'jimp';
 
-const sortPoints = {
-    special: 2, // * 10000
-    bundle: 1, // * 1000
-    series: { // * 100
-        annualpassseries: 12,
-        columbusseries: 11,
-        creatorcollabseries: 10,
-        cubeseries: 9,
-        dcuseries: 8,
-        frozenseries: 7,
-        lavaseries: 6,
-        marvelseries: 5,
-        platformseries: 4,
-        slurpseries: 3,
-        shadowseries: 2,
-        otherseries: 1
-    },
-    rarities: { // * 10
-        mythic: 8,
-        exotic: 7,
-        legendary: 6,
-        epic: 5,
-        rare: 4,
-        uncommon: 3,
-        common: 2,
-        otherrarity: 1
-    }
-};
-
-function calcSortPoints({ rarity, series, bundle, special }) {
-    let points = 0;
-
-    if (special) points += 10000 * sortPoints.special;
-    if (bundle) points += 1000 * sortPoints.bundle;
-    if (series) points += 100 * sortPoints.series[series.toLowerCase()] || sortPoints.series.otherseries;
-    if (rarity) points += 10 * (sortPoints.rarities[rarity.toLowerCase()] || sortPoints.series.otherrarity);
-
-    return points;
-};
-
-async function finishProgram(message) {
-    if (message) console.log(message);
-    console.log('\nPressione alguma tecla para finalizar');
-    process.stdin.setRawMode(true);
-    return new Promise(() => process.stdin.once('data', () => {
-        process.stdin.setRawMode(false);
-        process.exit();
-    }));
-};
+import { shopItem as shopItemImage, finishProgram } from './src/utils.js';
 
 console.log("[INFO] Verificando os itens da loja");
 
@@ -95,10 +47,10 @@ shopItems.forEach((shopItem) => {
         let itemImage;
 
         try {
-            if (itemSeries) itemBackground = await Jimp.read(`./src/images/series/${firstItem.series.backendValue}.png`);
+            if (itemSeries) itemBackground = await Jimp.read(`./src/images/series/${itemSeries}.png`);
             else itemBackground = await Jimp.read(`./src/images/rarities/${itemRarity}.png`);
         } catch {
-            itemBackground = await Jimp.read(`./src/images/rarities/src/data/images/rarities/Common.png`);
+            itemBackground = await Jimp.read(`./src/images/rarities/Common.png`);
         }
 
         try {
@@ -109,7 +61,7 @@ shopItems.forEach((shopItem) => {
             itemImage = missingItemImage;
         }
 
-        itemBackground.blit(itemImage.resize(256, 256), 0, 0);
+        itemBackground.resize(256, 256).blit(itemImage.resize(256, 256), 0, 0);
 
         const itemText = (shopItem.bundle ? shopItem.bundle.name : firstItem.name).toUpperCase();
         const textHeight = Jimp.measureTextHeight(burbankFont20, itemText, 245);
@@ -148,14 +100,7 @@ shopItems.forEach((shopItem) => {
         itemBackground.blit(priceTag, (128 - (PriceWidth / 2)), 220);
 
         console.log(`Item pronto: "${itemText}"`)
-
-        resolve({
-            name: itemText,
-            bundle: shopItem.bundle ? true : false,
-            series: itemSeries,
-            rarity: itemRarity,
-            image: itemBackground
-        });
+        resolve(new shopItemImage(itemText, shopItem.bundle, itemSeries, itemRarity, itemBackground));
     }));
 });
 
@@ -185,10 +130,8 @@ let lastLineOffset = 0;
 const itemImages = await Promise.all(itemPromises);
 
 itemImages.sort((a, b) => {
-    const aPoints = calcSortPoints(a);
-    const bPoints = calcSortPoints(b);
-    const nameOrder = a.name > b.name ? 1 : -1;
-    return bPoints - aPoints + nameOrder;
+    const namePoints = a.itemName > b.itemName ? 1 : a.itemName < b.itemName ? -1 : 0;
+    return b.sortPoints - a.sortPoints + namePoints;
 });
 
 console.log('\n[INFO] Gerando imagem da loja');
