@@ -2,6 +2,7 @@
 
 import fetch from 'node-fetch';
 import Jimp from 'jimp';
+import 'dotenv/config';
 
 import { shopItem as shopItemImage, finishProgram } from './src/utils.js';
 
@@ -9,7 +10,7 @@ console.log("[INFO] Verificando os itens da loja");
 
 const shopData = await fetch('https://fortnite-api.com/v2/shop/br/combined?language=pt-BR', {
     headers: {
-        //Authorization: 'Auth-Token'
+        //Authorization: process.env.API_TOKEN
     }
 }).then(async res => {
     if (res.ok) return await res.json();
@@ -149,6 +150,6 @@ itemImages.forEach(({ image }) => {
 
 });
 
-shopBackground.write(`./ImagensGeradas/ItemShop-_${currentDate[2]}-${currentDate[1]}-${currentDate[0]}_${shopData.hash}.png`);
+shopBackground.write(`./ImagensGeradas/ItemShop-_${currentDate[2]}-${currentDate[1]}-${currentDate[0]}_FN-API.com-${shopData.hash}.png`);
 
-finishProgram('[INFO] Imagem da loja criada');
+console.log('[INFO] Imagem da loja criada');
