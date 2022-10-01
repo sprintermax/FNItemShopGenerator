@@ -2,7 +2,7 @@ export default {
     sortpoints: {
         special: 2, // * 10000
         bundle: 1, // * 1000
-        series: { // * 100
+        series: { // * 50
             annualpassseries: 12,
             columbusseries: 11,
             creatorcollabseries: 10,

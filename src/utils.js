@@ -18,7 +18,7 @@ class shopItem {
 
         if (this.isSpecial) points += 10000 * config.sortpoints.special;
         if (this.isBundle) points += 1000 * config.sortpoints.bundle;
-        if (this.series) points += 100 * (config.sortpoints.series[this.series] || config.sortpoints.series.otherseries);
+        if (this.series) points += 50 * (config.sortpoints.series[this.series] || config.sortpoints.series.otherseries);
         if (this.rarity) points += 10 * (config.sortpoints.rarities[this.rarity] || config.sortpoints.series.otherrarity);
 
         return points;
