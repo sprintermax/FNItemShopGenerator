@@ -21,9 +21,9 @@ Just run `npm install` on Terminal.
 
 # Usage
 
-Run `npm start`, `node .` or `node index.js` on Terminal.
+Run `npm start`, `node .` or `node index_<API>.js` on Terminal.
 
--> On Windows you can just open the `Get Store.bat` file.
+-> On Windows you can just open the `Get Store <API>.bat` file.
 
 
 # Other
