@@ -2,18 +2,26 @@
 
 import fetch from "node-fetch";
 import Jimp from "jimp";
+import fs from "fs";
 import "dotenv/config";
+
+import gitUpload from "./src/github_upload.js";
+import discordWebhook from "./src/discord_webhook.js";
+
+// currently the endpoint has the token as optional
+// if (!process.env.FNAPI_COM_TOKEN) throw new Error("required FNAPI_COM_TOKEN not found on env");
 
 import { shopItem as shopItemImage, finishProgram } from "./src/utils.js";
 
 console.log("[INFO] Verificando os itens da loja");
 
+const requestHeaders = {}
+if (process.env.FNAPI_COM_TOKEN) requestHeaders.Authorization = process.env.FNAPI_COM_TOKEN;
+
 const shopData = await fetch(
   "https://fortnite-api.com/v2/shop/br/combined?language=pt-BR",
   {
-    headers: {
-      //Authorization: process.env.API_TOKEN
-    },
+    headers: requestHeaders,
   }
 )
   .then(async (res) => {
@@ -76,14 +84,14 @@ shopItems.forEach((shopItem) => {
         else if (firstItem.type.backendValue == "AthenaItemWrap")
           itemImage = await Jimp.read(
             firstItem.images.icon ||
-              firstItem.images.featured ||
-              firstItem.images.smallIcon
+            firstItem.images.featured ||
+            firstItem.images.smallIcon
           );
         else
           itemImage = await Jimp.read(
             firstItem.images.featured ||
-              firstItem.images.icon ||
-              firstItem.images.smallIcon
+            firstItem.images.icon ||
+            firstItem.images.smallIcon
           );
       } catch {
         itemImage = missingItemImage;
@@ -109,11 +117,10 @@ shopItems.forEach((shopItem) => {
       }
 
       if (shopItem.bundle || shopItem.items.length >= 2) {
-        const subItemsText = `${
-          shopItem.bundle
-            ? shopItem.items.length
-            : "+" + (shopItem.items.length - 1)
-        }`;
+        const subItemsText = `${shopItem.bundle
+          ? shopItem.items.length
+          : "+" + (shopItem.items.length - 1)
+          }`;
         const subItemsTextWidth = Jimp.measureText(burbankFont16, subItemsText);
         const subItemTag = new Jimp(subItemsTextWidth + 4, 20, 0x0);
         subItemTag.print(burbankFont16, 2, 4, subItemsText);
@@ -160,8 +167,8 @@ const collumsCount =
 shopBackground.resize(
   256 * collumsCount + 15 * (collumsCount - 1) + 100,
   256 * Math.ceil(shopItems.length / collumsCount) +
-    15 * (Math.ceil(shopItems.length / collumsCount) - 1) +
-    350
+  15 * (Math.ceil(shopItems.length / collumsCount) - 1) +
+  350
 );
 
 const titleText = "LOJA DE ITENS";
@@ -235,8 +242,19 @@ itemImages.forEach(({ image }) => {
   } else currentShopColumn += 1;
 });
 
-shopBackground.write(
-  `./ImagensGeradas/ItemShop-_${currentDate[2]}-${currentDate[1]}-${currentDate[0]}_FN-API.com-${shopData.hash}.png`
-);
+const savePath = './ImagensGeradas/';
 
-console.log("[INFO] Imagem da loja criada");
+function saveImage(version = 1) {
+  return new Promise(async (resolve, reject) => {
+    const fileName = `${String(currentDate[2]).padStart(2, '0')}-${String(currentDate[1]).padStart(2, '0')}-${String(currentDate[0]).padStart(2, '0')}_v${version}.png`;
+    if (fs.existsSync(savePath + fileName)) resolve(await saveImage(version + 1));
+    await shopBackground.writeAsync(savePath + fileName);
+    resolve(fileName);
+  })
+}
+
+saveImage().then((savedFile) => {
+  console.log("[INFO] Imagem da loja criada");
+  if (process.env.UPLOAD_TO_DISCORD_WEBHOOK) discordWebhook(savePath, savedFile);
+  if (process.env.UPLOAD_TO_GITHUB) gitUpload(savePath, savedFile);
+});
