@@ -56,16 +56,23 @@ Run `npm start`, `node .` or `node index_<API>.js` on Terminal.
   
  #### Possible Enviroment Variables:
 > `FNAPI_IO_TOKEN`: API Token for https://fortniteapi.io/
+>
 > `FNAPI_COM_TOKEN`: API Token for https://fortnite-api.com/
 
 > `UPLOAD_TO_DISCORD_WEBHOOK`: If should send the image on a discord webhook (yes/no) 
+>
 > `DISCORD_WEBHOOK_URL`: URL of the discord Webhook to use
 
 > `UPLOAD_TO_GITHUB`: If should upload the generated image to github (yes/no) 
+?
 > `GITHUB_TOKEN`: GitHub User Token
+>
 > `GIT_OWNER`: GitHub Account name
+>
 > `GIT_REPO`: GitHub Repository name
+>
 > `GIT_PATH`: Path inside the repository to save the file
+>
 > `GIT_BRANCH`: Branch of the repository to save the file
 
 
