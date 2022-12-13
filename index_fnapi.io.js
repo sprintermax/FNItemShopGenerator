@@ -245,7 +245,7 @@ function saveImage(version = 1) {
 
 saveImage().then((savedFile) => {
   console.log("[INFO] Imagem da loja criada");
-  if (process.env.UPLOAD_TO_DISCORD_WEBHOOK) discordWebhook(savePath, savedFile);
-  if (process.env.UPLOAD_TO_GITHUB) gitUpload(savePath, savedFile);
+  if (process.env.UPLOAD_TO_DISCORD_WEBHOOK.toLocaleLowerCase() === 'yes') discordWebhook(savePath, savedFile);
+  if (process.env.UPLOAD_TO_GITHUB.toLocaleLowerCase() === 'yes') gitUpload(savePath, savedFile);
 });
 

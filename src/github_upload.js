@@ -6,7 +6,7 @@ import "dotenv/config";
 
 export default async function upload(savePath, fileName) {
     const { GITHUB_TOKEN, UPLOAD_TO_GITHUB, GIT_OWNER, GIT_REPO, GIT_PATH, GIT_BRANCH } = process.env;
-    if (!GITHUB_TOKEN || !UPLOAD_TO_GITHUB) return;
+    if (!GITHUB_TOKEN || !UPLOAD_TO_GITHUB.toLocaleLowerCase() === 'yes') return;
     if (!GIT_OWNER || !GIT_REPO) throw new Error("Missing required GIT_OWNER and GIT_REPO from env");
     if (!fs.existsSync(savePath + fileName)) throw new Error(`Missing generated image on "${savePath + fileName}"`);
 
