@@ -36,7 +36,7 @@ const shopData = await fetch(
   });
 
 const currentDate = shopData.date.replace("T", "-").split(`-`);
-const shopItems = [...shopData.featured.entries, ...shopData.daily.entries];
+const shopItems = [...shopData.featured?.entries, ...shopData.daily?.entries];
 
 console.log(`[INFO] Loja verificada, ${shopItems.length} itens encontrados`);
 

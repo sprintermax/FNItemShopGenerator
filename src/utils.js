@@ -3,12 +3,13 @@
 import config from "./config.js";
 
 class shopItem {
-  constructor(itemName, isBundle, series, rarity, image, isSpecial) {
+  constructor(itemName, sectionName, mainType, series, rarity, image, isSpecial) {
     this.itemName = itemName;
-    this.isBundle = isBundle ? true : false;
+	this.sectionName = sectionName;
+	this.mainType = mainType;
     this.isSpecial = isSpecial ? true : false;
-    this.series = series ? series.toLowerCase() : null;
-    this.rarity = rarity.toLowerCase();
+    // this.series = series ? series.toLowerCase() : null;
+    // this.rarity = rarity.toLowerCase();
     this.sortPoints = this.calcSortPoints();
     this.image = image;
   }
@@ -17,7 +18,8 @@ class shopItem {
     let points = 0;
 
     if (this.isSpecial) points += 10000 * config.sortpoints.special;
-    if (this.isBundle) points += 1000 * config.sortpoints.bundle;
+    // if (this.mainType === "bundle") points += 1000 * config.sortpoints.bundle;
+    if (this.mainType === "sparks_song") points -= 10000; // why people hate songs hahaha
     if (this.series)
       points +=
         50 *
