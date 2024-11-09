@@ -76,17 +76,24 @@ shopItems.forEach((shopItem) => {
                 }
 
                 try {
-                    if (shopItem.mainType === "wrap")
+                    try {
+                        if (shopItem.mainType === "wrap")
+                            itemImage = await Jimp.read(
+                                firstItem.images.icon ||
+                                firstItem.images.featured ||
+                                (shopItem.displayAssets.find((DA) => DA.primaryMode == "BattleRoyale")?.background || shopItem.displayAssets[0].background) // .background was .url
+                            );
+                        else
+                            itemImage = await Jimp.read(
+                                (shopItem.displayAssets.find((DA) => DA.primaryMode == "BattleRoyale")?.background || shopItem.displayAssets[0].background) ||
+                                firstItem.images.icon
+                            );
+                    } catch {
                         itemImage = await Jimp.read(
-                            firstItem.images.icon ||
-                            firstItem.images.featured ||
-                            (shopItem.displayAssets.find((DA) => DA.primaryMode == "BattleRoyale")?.background || shopItem.displayAssets[0].background) // .background was .url
-                        );
-                    else
-                        itemImage = await Jimp.read(
-                            (shopItem.displayAssets.find((DA) => DA.primaryMode == "BattleRoyale")?.background || shopItem.displayAssets[0].background) ||
+                            (shopItem.displayAssets.find((DA) => DA.primaryMode == "BattleRoyale")?.url || shopItem.displayAssets[0].url) ||
                             firstItem.images.icon
                         );
+                    }
                 } catch {
                     itemImage = missingItemImage;
                 }

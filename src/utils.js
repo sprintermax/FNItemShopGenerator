@@ -19,7 +19,7 @@ class shopItem {
         
         if (this.isSpecial) points += 10000 * config.sortpoints.special;
         // if (this.mainType === "bundle") points += 1000 * config.sortpoints.bundle;
-        if (this.mainType === "sparks_song") points -= 10000; // why people hate songs hahaha
+        if (["sparksjamloop", "sparks_song"].includes(this.mainType)) points -= 10000; // why people hate songs hahaha
         if (this.series)
             points +=
         50 *

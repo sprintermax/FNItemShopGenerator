@@ -1,4 +1,4 @@
-"use strict";
+"use strict"; 
 
 import fetch from "node-fetch";
 import Jimp from "jimp";
@@ -19,7 +19,7 @@ const requestHeaders = {}
 if (process.env.FNAPI_COM_TOKEN) requestHeaders.Authorization = process.env.FNAPI_COM_TOKEN;
 
 const shopData = await fetch(
-    "https://fortnite-api.com/v2/shop/br/combined?language=pt-BR",
+    "https://fortnite-api.com/v2/shop?language=pt-BR",
     {
         headers: requestHeaders,
     }
@@ -36,7 +36,7 @@ const shopData = await fetch(
 });
 
 const currentDate = shopData.date.replace("T", "-").split(`-`);
-const shopItems = [...shopData.featured?.entries, ...shopData.daily?.entries];
+const shopItems = shopData.entries.filter(item => item.offerTag?.id != "sparksjamloop");;
 
 console.log(`[INFO] Loja verificada, ${shopItems.length} itens encontrados`);
 
@@ -58,9 +58,10 @@ const itemPromises = [];
 shopItems.forEach((shopItem) => {
     itemPromises.push(
         new Promise(async (resolve) => {
-            const firstItem = shopItem.items[0];
+            const itemCount = shopItem.brItems?.length || shopItem.tracks?.length || shopItem.instruments?.length || shopItem.cars?.length || shopItem.legoKits?.length
+            const firstItem = shopItem.brItems?.[0] || shopItem.tracks?.[0] || shopItem.instruments?.[0] || shopItem.cars?.[0] || shopItem.legoKits?.[0];
             const itemRarity =
-            firstItem.rarity.backendValue.split("EFortRarity::")[1];
+            firstItem.rarity?.backendValue.split("EFortRarity::")[1];
             const itemSeries = firstItem.series?.backendValue;
             let itemBackground;
             let itemImage;
@@ -83,25 +84,29 @@ shopItems.forEach((shopItem) => {
                     itemImage = await Jimp.read(shopItem.bundle.image);
                 else if (firstItem.type.backendValue == "AthenaItemWrap")
                     itemImage = await Jimp.read(
+                    shopItem.newDisplayAsset?.renderImages?.[0].image ||
                     firstItem.images.icon ||
                     firstItem.images.featured ||
-                    firstItem.images.smallIcon
+                    firstItem.images.smallIcon ||
+                    firstItem.images.large
                 );
                 else
                 itemImage = await Jimp.read(
+                    shopItem.newDisplayAsset?.renderImages?.[0].image ||
                     firstItem.images.featured ||
                     firstItem.images.icon ||
-                    firstItem.images.smallIcon
+                    firstItem.images.smallIcon ||
+                    firstItem.images.large
                 );
             } catch {
                 itemImage = missingItemImage;
             }
             
             itemBackground.resize(256, 256).blit(itemImage.resize(256, 256), 0, 0);
-            
+
             const itemText = (
-                shopItem.bundle ? shopItem.bundle.name : firstItem.name
-            ).toUpperCase();
+                shopItem.bundle?.name || firstItem.name || firstItem.title
+            )?.toUpperCase() || "?????";
             const textHeight = Jimp.measureTextHeight(burbankFont20, itemText, 245);
             const PriceWidth =
             26 + 5 + Jimp.measureText(burbankFont20, `${shopItem.finalPrice}`);
@@ -116,10 +121,10 @@ shopItems.forEach((shopItem) => {
                 priceTextPos = 178;
             }
             
-            if (shopItem.bundle || shopItem.items.length >= 2) {
+            if (shopItem.bundle || itemCount >= 2) {
                 const subItemsText = `${shopItem.bundle
-                    ? shopItem.items.length
-                    : "+" + (shopItem.items.length - 1)
+                    ? itemCount
+                    : "+" + (itemCount - 1)
                 }`;
                 const subItemsTextWidth = Jimp.measureText(burbankFont16, subItemsText);
                 const subItemTag = new Jimp(subItemsTextWidth + 4, 20, 0x0);
@@ -151,7 +156,8 @@ shopItems.forEach((shopItem) => {
             resolve(
                 new shopItemImage(
                     itemText,
-                    shopItem.bundle,
+                    shopItem.layoutId,
+                    firstItem.offerTag?.id,
                     itemSeries,
                     itemRarity,
                     itemBackground
@@ -161,8 +167,7 @@ shopItems.forEach((shopItem) => {
     );
 });
 
-const collumsCount =
-shopItems.length > 18 ? (shopItems.length > 21 ? 8 : 7) : 6;
+const collumsCount = shopItems.length > 48 ? (shopItems.length > 90 ? 16 : 12) : 8;
 
 shopBackground.resize(
     256 * collumsCount + 15 * (collumsCount - 1) + 100,
@@ -212,6 +217,8 @@ let lastLineOffset = 0;
 
 const itemImages = await Promise.all(itemPromises);
 
+// console.log(JSON.stringify(itemImages))
+
 itemImages.sort((a, b) => {
     const namePoints =
     a.itemName > b.itemName ? 1 : a.itemName < b.itemName ? -1 : 0;
@@ -221,6 +228,7 @@ itemImages.sort((a, b) => {
 console.log("\n[INFO] Gerando imagem da loja");
 
 itemImages.forEach(({ image }) => {
+
     if (
         lastLineOffset === 0 &&
         currentShopRow === Math.floor(itemImages.length / collumsCount)
@@ -247,7 +255,7 @@ const savePath = './ImagensGeradas/';
 function saveImage(version = 1) {
     return new Promise(async (resolve, reject) => {
         const fileName = `${String(currentDate[2]).padStart(2, '0')}-${String(currentDate[1]).padStart(2, '0')}-${String(currentDate[0]).padStart(2, '0')}_v${version}.png`;
-        if (fs.existsSync(savePath + fileName)) resolve(await saveImage(version + 1));
+        if (fs.existsSync(savePath + fileName)) return resolve(await saveImage(version + 1));
         await shopBackground.writeAsync(savePath + fileName);
         resolve(fileName);
     })
